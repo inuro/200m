@@ -59,7 +59,7 @@
 			}
 
 			latestLocation = e.latlng;
-			var locationRadius = e.accuracy / 2;
+		//	var locationRadius = e.accuracy / 2;
 
 			if(!centerCircle){
 				centerCircle = L.circle(latestLocation, centerCircleRadius, {
@@ -71,7 +71,7 @@
 				centerCircle.addTo(map);
 			}
 			centerCircle.setLatLng(latestLocation);
-			centerCircle.setRadius(locationRadius);
+		//	centerCircle.setRadius(locationRadius);
 
 			if(!centerPin){
 				centerPin = L.marker(e.latlng).addTo(map);
@@ -106,9 +106,6 @@
 		})
 		map.on('locationfound', onLocationFound);
 		map.on('locationerror', onLocationError);
-
-
-		map.locate({setView: true, maxZoom: 16});
 	</script>
 </body>
 </html>
