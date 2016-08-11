@@ -85,14 +85,12 @@
 			alert(e.message);
 		}
 
-		function onMapClick(e){
+		function onMapDblclick(e){
 			if(latestCircleLatLng != latestLocation){
 				L.circle(latestLocation, searchCircleRadius, searchCircleStyle).addTo(map);
 				latestCircleLatLng = latestLocation;
 			}
 		}
-
-		map.on('click', onMapClick);
 
 		//continuous watching location
 	//	map.on('locationfound', onLocationFound);
@@ -106,6 +104,10 @@
 		})
 		map.on('locationfound', onLocationFound);
 		map.on('locationerror', onLocationError);
+		map.doubleClickZoom.disable();
+		map.on('dblclick', onMapDblclick);
+
+
 	</script>
 </body>
 </html>
