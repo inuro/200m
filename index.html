@@ -27,6 +27,12 @@
 		var centerCircle = null;
 		var centerPin = null;
 
+		var circle_200m_style = {
+			weight: 1,
+			color: '#0000ff',
+			fillColor: '#ccccff',
+			fillOpacity: 0.1
+		}
 
 		var map = L.map('map');
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaW51cm8iLCJhIjoiY2lycXdrZHllMGdzeXQybmsyc2JmaHlqcCJ9.fFTwIuK3ERkV5_WwQWL2vw', {
@@ -41,6 +47,9 @@
 
 		//location event handler
 		function onLocationFound(e) {
+			//after 1st location found, disable setView
+			map.locate({setview:false});
+			
 			//prevent same location
 			if(latestLocation == e.latlng){
 				return;
@@ -51,9 +60,9 @@
 
 			if(!centerCircle){
 				centerCircle = L.circle(latestLocation, locationRadius, {
-					weight: 0,
-					color: 'blue',
-					fillColor: '#aaaaff',
+					weight: 2,
+					color: 'pink',
+					fillColor: '#ffcccc',
 					fillOpacity: 0.2
 				});
 				centerCircle.addTo(map);
@@ -66,17 +75,6 @@
 			}
 			centerPin.setLatLng(latestLocation);
 			centerPin.bindPopup(latestLocation.toString());
-
-
-		//	L.marker(e.latlng).addTo(map)
-		//		.bindPopup(e.latlng.toString()).openPopup();
-		
-		/*
-			var radius = e.accuracy / 2;
-			L.marker(e.latlng).addTo(map)
-				.bindPopup("You are within " + radius + " meters from this point").openPopup();
-			L.circle(e.latlng, radius).addTo(map);
-		*/
 		}
 
 		function onLocationError(e) {
@@ -86,7 +84,7 @@
 
 		function onMapClick(e){
 			if(latestCircleLatLng != latestLocation){
-				L.circle(latestLocation, radius).addTo(map);
+				L.circle(latestLocation, radius, circle_200m_style).addTo(map);
 				latestCircleLatLng = latestLocation;
 			}
 		}
