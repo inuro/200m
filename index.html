@@ -50,7 +50,7 @@
 		function onLocationFound(e) {
 			//after 1st location found, disable setView
 			if(!latestLocation){
-				map.setView(e.latlng);
+				map.setView(e.latlng, 16);
 			}
 
 			//prevent same location
@@ -64,7 +64,7 @@
 			if(!centerCircle){
 				centerCircle = L.circle(latestLocation, centerCircleRadius, {
 					weight: 2,
-					color: 'red',
+					color: 'pink',
 					fillColor: '#ffcccc',
 					fillOpacity: 0.2
 				});
