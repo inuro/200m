@@ -31,6 +31,10 @@
 		var latestLocation = null;
 		var latestCircleLatLng = null;
 		var radius = 200;
+
+		var centerCircle = null;
+
+
 		var map = L.map('map');
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaW51cm8iLCJhIjoiY2lycXdrZHllMGdzeXQybmsyc2JmaHlqcCJ9.fFTwIuK3ERkV5_WwQWL2vw', {
 			maxZoom: 18,
@@ -40,15 +44,35 @@
 			id: 'mapbox.streets'
 		}).addTo(map);
 
+
+
+		//location event handler
 		function onLocationFound(e) {
+			//prevent same location
+			if(latestLocation == e.latlng){
+				return;
+			}
+
 			latestLocation = e.latlng;
-			var circle = L.circle(latestLocation, e.accuracy / 2, {
-				weight: 0,
-				color: 'blue',
-				fillColor: '#aaaaff',
-				fillOpacity: 0.2
-			});
-			circle.addTo(map);
+			var locationRadius = e.accuracy / 2;
+
+			if(!centerCircle){
+				centerCircle = L.circle(latestLocation, locationRadius, {
+					weight: 0,
+					color: 'blue',
+					fillColor: '#aaaaff',
+					fillOpacity: 0.2
+				});
+				centerCircle.addTo(map);
+			}
+			else{
+				centerCircle.setLatLng(latestLocation);
+				centerCircle.setRadius(locationRadius);
+			}
+
+		//	L.marker(e.latlng).addTo(map)
+		//		.bindPopup(e.latlng.toString()).openPopup();
+		
 		/*
 			var radius = e.accuracy / 2;
 			L.marker(e.latlng).addTo(map)
@@ -74,9 +98,15 @@
 		//continuous watching location
 	//	map.on('locationfound', onLocationFound);
 	//	map.on('locationerror', onLocationError);
-		map.locate("setView:true, watch:true")
-		.on('locationfound', onLocationFound)
-		.on('locationerror', onLocationError);
+		map.locate({
+			setView: true, 
+			watch: true, 
+			enableHighAccuracy: true,
+			maximumAge: 0, 
+			timeout: 3000000
+		})
+		map.on('locationfound', onLocationFound);
+		map.on('locationerror', onLocationError);
 
 
 		map.locate({setView: true, maxZoom: 16});
