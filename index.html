@@ -33,6 +33,7 @@
 		var radius = 200;
 
 		var centerCircle = null;
+		var centerPin = null;
 
 
 		var map = L.map('map');
@@ -65,10 +66,15 @@
 				});
 				centerCircle.addTo(map);
 			}
-			else{
-				centerCircle.setLatLng(latestLocation);
-				centerCircle.setRadius(locationRadius);
+			centerCircle.setLatLng(latestLocation);
+			centerCircle.setRadius(locationRadius);
+
+			if(!centerPin){
+				centerPin = L.marker(e.latlng).addTo(map);
 			}
+			centerPin.setLatLng(latestLocation);
+			centerPin.bindPopup(latestLocation.toString());
+
 
 		//	L.marker(e.latlng).addTo(map)
 		//		.bindPopup(e.latlng.toString()).openPopup();
