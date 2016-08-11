@@ -22,17 +22,18 @@
 	<script>
 		var latestLocation = null;
 		var latestCircleLatLng = null;
-		var radius = 200;
-
+		
 		var centerCircle = null;
 		var centerPin = null;
+		var centerCircleRadius = 40;
 
-		var circle_200m_style = {
+		var searchCircleRadius = 200;
+		var searchCircleStyle = {
 			weight: 1,
 			color: '#0000ff',
 			fillColor: '#ccccff',
 			fillOpacity: 0.1
-		}
+		};
 
 		var map = L.map('map');
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaW51cm8iLCJhIjoiY2lycXdrZHllMGdzeXQybmsyc2JmaHlqcCJ9.fFTwIuK3ERkV5_WwQWL2vw', {
@@ -49,7 +50,7 @@
 		function onLocationFound(e) {
 			//after 1st location found, disable setView
 			map.locate({setview:false});
-			
+
 			//prevent same location
 			if(latestLocation == e.latlng){
 				return;
@@ -59,7 +60,7 @@
 			var locationRadius = e.accuracy / 2;
 
 			if(!centerCircle){
-				centerCircle = L.circle(latestLocation, locationRadius, {
+				centerCircle = L.circle(latestLocation, centerCircleRadius, {
 					weight: 2,
 					color: 'pink',
 					fillColor: '#ffcccc',
@@ -84,7 +85,7 @@
 
 		function onMapClick(e){
 			if(latestCircleLatLng != latestLocation){
-				L.circle(latestLocation, radius, circle_200m_style).addTo(map);
+				L.circle(latestLocation, searchCircleRadius, searchCircleStyle).addTo(map);
 				latestCircleLatLng = latestLocation;
 			}
 		}
