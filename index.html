@@ -1,8 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>200m radius circles</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+	<title>200m</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<link rel="shortcut icon" href="favicon.ico" />
+	<link rel="icon" href="favicon.ico" />
+	<link rel="apple-touch-icon" href="200m_60.png" />
+	<link rel="apple-touch-icon" sizes="76x76" href="200m_76.png" />
+	<link rel="apple-touch-icon" sizes="120x120" href="200m_120.png" />
+	<link rel="apple-touch-icon" sizes="152x152" href="200m_152.png" />
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+
+	<meta property="og:title" content="200ｍ radius circles" />
+	<meta property="og:description" content="Double-tap to draw 200m radius circle for catching Pokemon. Long-tap to clear existing circles." />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="https://inuro.github.io/200m/" />
+	<meta property="og:image" content="https://inuro.github.io/200m/200m_original.png" />
+	<meta property="fb:app_id" content="1659170097660873"/> 
+
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:image" content="https://inuro.github.io/200m/200m_original.png" />
+	<meta name="twitter:title" content="200m radius circles for Pokemon GO" />
+	<meta name="twitter:description" content="Double-tap to draw 200m radius circle for catching Pokemon. Long-tap to clear existing circles." />
+	<meta name="twitter:site" content="@inuro" />
+
+
+
+
+
 	<link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
 	<script src="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
 
@@ -28,12 +53,49 @@
 		var centerCircleRadius = 40;
 
 		var searchCircleRadius = 200;
+	/*
 		var searchCircleStyle = {
 			weight: 1,
 			color: '#0000ff',
 			fillColor: '#ccccff',
 			fillOpacity: 0.1
 		};
+	*/
+		var searchCircleCount = 0;
+		var searchCircleStyle = function(){
+			var searchCircleColor;
+			if(searchCircleCount == 0){
+				searchCircleColor = '#00cc00';
+				searchFillColor = '#88cc88';
+				searchFillOpacity = '0.2';
+			}
+			else if(searchCircleCount == 1){
+				searchCircleColor = '#ffcc00';
+				searchFillColor = '#ffcc00';
+				searchFillOpacity = '0.0';
+			}
+			else if(searchCircleCount == 2){
+				searchCircleColor = '#ff4400';
+				searchFillColor = '#ff4400';
+				searchFillOpacity = '0.0';
+			}
+			else if(searchCircleCount == 3){
+				searchCircleColor = '#0044ff';
+				searchFillColor = '#0044ff';
+				searchFillOpacity = '0.0';
+			}
+			else{
+				searchCircleColor = '#444444';
+				searchFillColor = '#444444';
+				searchFillOpacity = '0.0';
+			}
+			return {
+				weight: 4,
+				color: searchCircleColor,
+				fillColor: searchFillColor,
+				fillOpacity: searchFillOpacity
+			};
+		}
 
 		var map = L.map('map');
 		L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiaW51cm8iLCJhIjoiY2lycXdrZHllMGdzeXQybmsyc2JmaHlqcCJ9.fFTwIuK3ERkV5_WwQWL2vw', {
@@ -63,7 +125,7 @@
 
 			if(!centerCircle){
 				centerCircle = L.circle(latestLocation, centerCircleRadius, {
-					weight: 2,
+					weight: 4,
 					color: 'pink',
 					fillColor: '#ffcccc',
 					fillOpacity: 0.2
@@ -85,12 +147,50 @@
 			alert(e.message);
 		}
 
+		var circles = [];
+		var KEY_CIRCLES = 'circles';
+		function addCircle(latlng, radius, options) {
+			var circle = L.circle(latlng, radius, options);
+			circle.addTo(map);
+			circles.push(circle);
+			latestCircleLatLng = latlng;
+			searchCircleCount++;
+
+			// Update circles data in localStorage
+			var data = [];
+			circles.forEach(function (circle) {
+				data.push([circle.getLatLng(), circle.getRadius(), circle.options]);
+			});
+			localStorage.setItem(KEY_CIRCLES, JSON.stringify(data));
+		}
+
 		function onMapDblclick(e){
 			if(latestCircleLatLng != latestLocation){
-				L.circle(latestLocation, searchCircleRadius, searchCircleStyle).addTo(map);
-				latestCircleLatLng = latestLocation;
+				addCircle(latestLocation, searchCircleRadius, searchCircleStyle());
 			}
 		}
+
+		function onMapTapHold() {
+			circles.forEach(function (circle) {
+				circle.removeFrom(map);
+			});
+			circles = [];
+			searchCircleCount = 0;
+			localStorage.removeItem(KEY_CIRCLES);
+			latestCircleLatLng = null;
+		}
+
+		var timerId;
+		function clearTimer() {
+			clearTimeout(timerId);
+		}
+		map.on('mouseup', clearTimer);
+		map.on('dragstart', clearTimer);
+		map.on('zoomstart', clearTimer);
+
+		map.on('mousedown', function () {
+			timerId = setTimeout(onMapTapHold, 1000);
+		});
 
 		//continuous watching location
 	//	map.on('locationfound', onLocationFound);
@@ -107,7 +207,16 @@
 		map.doubleClickZoom.disable();
 		map.on('dblclick', onMapDblclick);
 
+		function initialize() {
+			// Initialize circles by localStorage data
+			var circles = JSON.parse(localStorage.getItem(KEY_CIRCLES));
+			if (circles === null) return;
 
+			circles.forEach(function (circle) {
+				addCircle.apply(this, circle);
+			});
+		}
+		map.on('load', initialize);
 	</script>
 </body>
 </html>
