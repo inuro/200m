@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>200m radius circles</title>
+	<title>200m</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 	<link rel="apple-touch-icon" href="200m_60.png">
@@ -159,6 +159,7 @@
 			circles = [];
 			searchCircleCount = 0;
 			localStorage.removeItem(KEY_CIRCLES);
+			latestCircleLatLng = null;
 		}
 
 		var timerId;
