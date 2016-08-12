@@ -129,13 +129,36 @@
 			alert(e.message);
 		}
 
+		var circles = [];
 		function onMapDblclick(e){
 			if(latestCircleLatLng != latestLocation){
-				L.circle(latestLocation, searchCircleRadius, searchCircleStyle()).addTo(map);
+				var circle = L.circle(latestLocation, searchCircleRadius, searchCircleStyle());
+				circle.addTo(map);
+				circles.push(circle);
 				latestCircleLatLng = latestLocation;
 				searchCircleCount++;
 			}
 		}
+
+		function onMapTapHold() {
+			circles.forEach(function (circle) {
+				circle.removeFrom(map);
+			});
+			circles = [];
+			searchCircleCount = 0;
+		}
+
+		var timerId;
+		function clearTimer() {
+			clearTimeout(timerId);
+		}
+		map.on('mouseup', clearTimer);
+		map.on('dragstart', clearTimer);
+		map.on('zoomstart', clearTimer);
+
+		map.on('mousedown', function () {
+			timerId = setTimeout(onMapTapHold, 1000);
+		});
 
 		//continuous watching location
 	//	map.on('locationfound', onLocationFound);
