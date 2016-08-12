@@ -8,7 +8,7 @@
 	<link rel="apple-touch-icon" sizes="76x76" href="200m_76.png">
 	<link rel="apple-touch-icon" sizes="120x120" href="200m_120.png">
 	<link rel="apple-touch-icon" sizes="152x152" href="200m_152.png">
-	<!-- meta name="apple-mobile-web-app-capable" content="yes" -->
+	<meta name="apple-mobile-web-app-capable" content="yes">
 
 	<link rel="stylesheet" href="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.css" />
 	<script src="https://npmcdn.com/leaflet@1.0.0-rc.3/dist/leaflet.js"></script>
@@ -130,13 +130,25 @@
 		}
 
 		var circles = [];
+		var KEY_CIRCLES = 'circles';
+		function addCircle(latlng, radius, options) {
+			var circle = L.circle(latlng, radius, options);
+			circle.addTo(map);
+			circles.push(circle);
+			latestCircleLatLng = latlng;
+			searchCircleCount++;
+
+			// Update circles data in localStorage
+			var data = [];
+			circles.forEach(function (circle) {
+				data.push([circle.getLatLng(), circle.getRadius(), circle.options]);
+			});
+			localStorage.setItem(KEY_CIRCLES, JSON.stringify(data));
+		}
+
 		function onMapDblclick(e){
 			if(latestCircleLatLng != latestLocation){
-				var circle = L.circle(latestLocation, searchCircleRadius, searchCircleStyle());
-				circle.addTo(map);
-				circles.push(circle);
-				latestCircleLatLng = latestLocation;
-				searchCircleCount++;
+				addCircle(latestLocation, searchCircleRadius, searchCircleStyle());
 			}
 		}
 
@@ -146,6 +158,7 @@
 			});
 			circles = [];
 			searchCircleCount = 0;
+			localStorage.removeItem(KEY_CIRCLES);
 		}
 
 		var timerId;
@@ -175,7 +188,16 @@
 		map.doubleClickZoom.disable();
 		map.on('dblclick', onMapDblclick);
 
+		function initialize() {
+			// Initialize circles by localStorage data
+			var circles = JSON.parse(localStorage.getItem(KEY_CIRCLES));
+			if (circles === null) return;
 
+			circles.forEach(function (circle) {
+				addCircle.apply(this, circle);
+			});
+		}
+		map.on('load', initialize);
 	</script>
 </body>
 </html>
