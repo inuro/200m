@@ -40,19 +40,25 @@
 		var searchCircleStyle = function(){
 			var searchCircleColor;
 			if(searchCircleCount == 0){
-				searchCircleColor = '#00ff00';
+				searchCircleColor = '#00cc00';
+				searchFillColor = '#88cc88';
+				searchFillOpacity = '0.2';
 			}
 			else if(searchCircleCount == 1){
-				searchCircleColor = '#ffff00';
+				searchCircleColor = '#ffcc00';
+				searchFillColor = '#ffcc00';
+				searchFillOpacity = '0.0';
 			}
 			else{
-				searchCircleColor = '#ff0000';
+				searchCircleColor = '#ff4400';
+				searchFillColor = '#ff4400';
+				searchFillOpacity = '0.0';
 			}
 			return {
-				weight: 3,
+				weight: 4,
 				color: searchCircleColor,
-			//	fillColor: '#ccccff',
-				fillOpacity: 0.0
+				fillColor: searchFillColor,
+				fillOpacity: searchFillOpacity
 			};
 		}
 
@@ -84,7 +90,7 @@
 
 			if(!centerCircle){
 				centerCircle = L.circle(latestLocation, centerCircleRadius, {
-					weight: 2,
+					weight: 4,
 					color: 'pink',
 					fillColor: '#ffcccc',
 					fillOpacity: 0.2
